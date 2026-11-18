@@ -2,7 +2,7 @@
 # in place, not recreated.
 resource "aws_sqs_queue" "order_queue" {
   name                       = "order-request-queue"
-  visibility_timeout_seconds = 60 # Lambda timeout (10s) x 6, per AWS guidance.
+  visibility_timeout_seconds = 30 # Lambda timeout (10s) x 6, per AWS guidance.
   message_retention_seconds  = 345600
   sqs_managed_sse_enabled    = true
 
