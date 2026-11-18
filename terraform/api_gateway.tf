@@ -80,11 +80,11 @@ resource "aws_api_gateway_method_response" "bad_request" {
 }
 
 resource "aws_api_gateway_integration_response" "bad_request" {
-  rest_api_id        = aws_api_gateway_rest_api.orders.id
-  resource_id        = aws_api_gateway_resource.orders.id
-  http_method        = aws_api_gateway_method.post_orders.http_method
-  status_code        = aws_api_gateway_method_response.bad_request.status_code
-  selection_pattern  = "4\\d{2}"
+  rest_api_id       = aws_api_gateway_rest_api.orders.id
+  resource_id       = aws_api_gateway_resource.orders.id
+  http_method       = aws_api_gateway_method.post_orders.http_method
+  status_code       = aws_api_gateway_method_response.bad_request.status_code
+  selection_pattern = "4\\d{2}"
 
   depends_on = [aws_api_gateway_integration.orders_to_sqs]
 }
@@ -112,13 +112,13 @@ resource "aws_api_gateway_deployment" "orders" {
 
   triggers = {
     redeployment = sha1(jsonencode({
-      integration            = aws_api_gateway_integration.orders_to_sqs.id
-      request_templates      = aws_api_gateway_integration.orders_to_sqs.request_templates
-      request_parameters     = aws_api_gateway_integration.orders_to_sqs.request_parameters
-      method                 = aws_api_gateway_method.post_orders.id
-      accepted_response      = aws_api_gateway_integration_response.accepted.id
-      bad_request_response   = aws_api_gateway_integration_response.bad_request.id
-      server_error_response  = aws_api_gateway_integration_response.server_error.id
+      integration           = aws_api_gateway_integration.orders_to_sqs.id
+      request_templates     = aws_api_gateway_integration.orders_to_sqs.request_templates
+      request_parameters    = aws_api_gateway_integration.orders_to_sqs.request_parameters
+      method                = aws_api_gateway_method.post_orders.id
+      accepted_response     = aws_api_gateway_integration_response.accepted.id
+      bad_request_response  = aws_api_gateway_integration_response.bad_request.id
+      server_error_response = aws_api_gateway_integration_response.server_error.id
     }))
   }
 

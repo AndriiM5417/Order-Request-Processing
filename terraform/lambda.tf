@@ -24,7 +24,7 @@ resource "aws_lambda_function" "processor" {
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.processor_lambda_sqs,
+    aws_iam_role_policy.processor_lambda_sqs_restricted,
     aws_iam_role_policy.processor_lambda_dynamodb,
     aws_cloudwatch_log_group.processor,
   ]
@@ -36,6 +36,6 @@ resource "aws_lambda_event_source_mapping" "order_queue_trigger" {
   batch_size       = 1 # One failed message cannot cause others to be retried.
 
   depends_on = [
-    aws_iam_role_policy_attachment.processor_lambda_sqs
+    aws_iam_role_policy.processor_lambda_sqs_restricted
   ]
 }

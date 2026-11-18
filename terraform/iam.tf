@@ -14,10 +14,7 @@ resource "aws_iam_role" "processor_lambda_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "processor_lambda_sqs" {
-  role       = aws_iam_role.processor_lambda_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-}
+
 
 # Lambda can write only to this project's order table.
 resource "aws_iam_role_policy" "processor_lambda_dynamodb" {
@@ -63,6 +60,39 @@ resource "aws_iam_role_policy" "api_gateway_send_message" {
         Effect   = "Allow"
         Action   = ["sqs:SendMessage"]
         Resource = aws_sqs_queue.order_queue.arn
+      }
+    ]
+  })
+}
+
+
+
+
+# Restrict Lambda SQS access to the project's queue.
+resource "aws_iam_role_policy" "processor_lambda_sqs_restricted" {
+  name = "order-processor-sqs-restricted"
+  role = aws_iam_role.processor_lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ]
+        Resource = aws_sqs_queue.order_queue.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "*"
       }
     ]
   })
