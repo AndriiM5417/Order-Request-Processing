@@ -1,0 +1,78 @@
+Before curl execute:
+
+export API_KEY=$(aws apigateway get-api-key \
+  --api-key p2v1g96ezc \
+  --include-value \
+  --query 'value' \
+  --output text)
+
+=======================================================================================================================================
+successful command example(before run change "order_id"):
+
+curl -i -X POST \
+  "https://jea79hvkp8.execute-api.eu-central-1.amazonaws.com/dev/orders" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $API_KEY" \
+  -d '{
+    "order_id": "ok-007",
+    "customer_id": "customer-ok",
+    "items": [
+      {
+        "product_id": "sku-001",
+        "quantity": 1
+      }
+    ]
+  }'
+
+======================================================================================================================================
+
+incorrect command example:
+
+curl -i -X POST \
+  "https://jea79hvkp8.execute-api.eu-central-1.amazonaws.com/dev/orders" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $API_KEY" \
+  -d '{
+    "order_id": 98765,
+    "customer_id": "customer-invalid",
+    "items": [
+      {
+        "product_id": "sku-001",
+        "quantity": 1
+      }
+    ]
+  }'
+
+
+=======================================================================================================================================
+
+API_URL="https://jea79hvkp8.execute-api.eu-central-1.amazonaws.com/dev/orders"
+
+if [[ -z "$API_KEY" ]]; then
+  echo "ERROR: API_KEY is not set"
+else
+  START=$(date +%s%N)
+
+  for i in $(seq 1 100); do
+    (
+      curl -sS -o /dev/null \
+        -w "Order $i: HTTP %{http_code}\n" \
+        --max-time 20 \
+        -X POST "$API_URL" \
+        -H "Content-Type: application/json" \
+        -H "x-api-key: $API_KEY" \
+        -d "{\"order_id\":\"load-${START}-${i}\",\"customer_id\":\"load-test\",\"items\":[{\"product_id\":\"sku-001\",\"quantity\":1}]}"
+    ) &
+  done
+
+  wait
+
+  END=$(date +%s%N)
+  echo "Elapsed: $(( (END - START) / 1000000 )) ms"
+fi
+
+
+========================================================================================================================================
+
+if [[ -z "$API_KEY" ]]; then   echo "ERROR: API_KEY is not set"; else   START=$(date +%s%N);    for i in $(seq 1 100); do     (       curl -sS -o /dev/null         -w "Order $i: HTTP %{http_code}\n"         --max-time 20         -X POST "$API_URL"         -H "Content-Type: application/json"         -H "x-api-key: $API_KEY"         -d "{\"order_id\":\"load-${START}-${i}\",\"customer_id\":\"load-test\",\"items\":[{\"product_id\":\"sku-001\",\"quantity\":1}]}";     ) &   done;    wait;    END=$(date +%s%N);   echo "Elapsed: $(( (END - START) / 1000000 )) ms"; fi
+
